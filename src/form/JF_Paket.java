@@ -5,19 +5,72 @@
  */
 package form;
 
+import config.Koneksi;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author user
  */
 public class JF_Paket extends javax.swing.JFrame {
+    
+    private Statement st;
+    private ResultSet rspaket;
+    private String sql="";
+    private String id, tipe;
+    private int asuransi, harga;
 
     /**
      * Creates new form JF_Paket
      */
     public JF_Paket() {
         initComponents();
+        koneksiPaket();
+        dataPaket("select * from tb12_paket");
     }
-
+    
+    Koneksi conn = new Koneksi();
+    
+    private void koneksiPaket(){
+        conn.kon();
+    }
+    
+    private void dataPaket(String sql){
+        DefaultTableModel dataList = new DefaultTableModel();
+        dataList.addColumn("No");
+        dataList.addColumn("ID Paket");
+        dataList.addColumn("Tipe Paket");
+        dataList.addColumn("Asuransi Paket");
+        dataList.addColumn("Harga Paket");
+        try {
+            int i = 1;
+            st = conn.getCon().createStatement();
+            rspaket = st.executeQuery("select * from tb12_paket");
+            while(rspaket.next()){
+                dataList.addRow(new Object[]{
+                    "" + i++,
+                    rspaket.getString(1),
+                    rspaket.getString(2),
+                    rspaket.getString(3),
+                    rspaket.getString(4),
+                });
+                tablePaket.setModel(dataList);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Gagal menampilkan data" + e.getMessage(), "error", JOptionPane.OK_OPTION);
+        }
+    }
+    
+    private void defaultData(){
+        txtIdPaket.setText("");
+        txtTipePaket.setSelectedItem("--pilih--");
+        txtAsuransiPaket.setText("");
+        txtHargaPaket.setText("");
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -33,7 +86,6 @@ public class JF_Paket extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         txtIdPaket = new javax.swing.JTextField();
-        txtTipePaket = new javax.swing.JComboBox<>();
         txtAsuransiPaket = new javax.swing.JTextField();
         txtHargaPaket = new javax.swing.JTextField();
         jScrollPane = new javax.swing.JScrollPane();
@@ -44,6 +96,7 @@ public class JF_Paket extends javax.swing.JFrame {
         btnBatal = new javax.swing.JButton();
         btnKeluar = new javax.swing.JButton();
         btnBeranda = new javax.swing.JButton();
+        txtTipePaket = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -62,31 +115,6 @@ public class JF_Paket extends javax.swing.JFrame {
 
         jLabel5.setText("Harga Paket");
 
-        txtIdPaket.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtIdPaketActionPerformed(evt);
-            }
-        });
-
-        txtTipePaket.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        txtTipePaket.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtTipePaketActionPerformed(evt);
-            }
-        });
-
-        txtAsuransiPaket.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtAsuransiPaketActionPerformed(evt);
-            }
-        });
-
-        txtHargaPaket.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtHargaPaketActionPerformed(evt);
-            }
-        });
-
         tablePaket.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -98,6 +126,11 @@ public class JF_Paket extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tablePaket.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tablePaketMouseClicked(evt);
+            }
+        });
         jScrollPane.setViewportView(tablePaket);
 
         btnSimpan.setText("simpan");
@@ -122,17 +155,34 @@ public class JF_Paket extends javax.swing.JFrame {
         });
 
         btnBatal.setText("batal");
+        btnBatal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBatalActionPerformed(evt);
+            }
+        });
 
         btnKeluar.setText("keluar");
+        btnKeluar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnKeluarActionPerformed(evt);
+            }
+        });
 
         btnBeranda.setText("beranda");
+        btnBeranda.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBerandaActionPerformed(evt);
+            }
+        });
+
+        txtTipePaket.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "--pilih--", "reguler", "kilat", "ekspress", "bigpress" }));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(35, 35, 35)
+                .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(btnBeranda, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnKeluar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -153,7 +203,7 @@ public class JF_Paket extends javax.swing.JFrame {
                                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txtTipePaket, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(52, 52, 52)
+                        .addGap(40, 40, 40)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -164,7 +214,7 @@ public class JF_Paket extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txtAsuransiPaket, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addComponent(jScrollPane))
-                .addContainerGap(50, Short.MAX_VALUE))
+                .addContainerGap(40, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -180,9 +230,9 @@ public class JF_Paket extends javax.swing.JFrame {
                         .addGap(26, 26, 26)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtTipePaket, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtHargaPaket, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(txtHargaPaket, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtTipePaket, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(32, 32, 32)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -205,33 +255,90 @@ public class JF_Paket extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txtHargaPaketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtHargaPaketActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtHargaPaketActionPerformed
-
-    private void txtTipePaketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTipePaketActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtTipePaketActionPerformed
-
-    private void txtIdPaketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdPaketActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtIdPaketActionPerformed
-
-    private void txtAsuransiPaketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAsuransiPaketActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtAsuransiPaketActionPerformed
-
     private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusActionPerformed
         // TODO add your handling code here:
+        id = String.valueOf(txtIdPaket.getText());
+        if(JOptionPane.showConfirmDialog( null, "Apakah anda yakin ingin menghapus data ini", "Konfirmasi",
+            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+        {
+            try {
+                sql = "delete from tb12_paket where id_paket = '"+id+"' ";
+                st = conn.getCon().createStatement();
+                st.execute(sql);
+                dataPaket("select * from tb12_paket");
+                JOptionPane.showMessageDialog(null, "Data berhasil dihapus");
+                defaultData();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Data gagal dihapus" + e.getMessage());
+            }
+        }
     }//GEN-LAST:event_btnHapusActionPerformed
 
     private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
         // TODO add your handling code here:
+        id = String.valueOf(txtIdPaket.getText());
+        tipe = txtTipePaket.getItemAt(txtTipePaket.getSelectedIndex()).toString();
+        asuransi = Integer.parseInt(txtAsuransiPaket.getText());
+        harga = Integer.parseInt(txtHargaPaket.getText());
+        try {
+            sql = "insert into tb12_paket value ("+" '"+ id +"', '"+ tipe +"', '"+ asuransi +"', '"+ harga +"' "+")";
+            st = conn.getCon().createStatement();
+            st.execute(sql);
+            dataPaket("select * from tb12_paket");
+            JOptionPane.showMessageDialog(null, "Data berhasil disimpan");
+            defaultData();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Data gagal disimpan" + e.getMessage());
+        }
     }//GEN-LAST:event_btnSimpanActionPerformed
 
     private void btnUbahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUbahActionPerformed
         // TODO add your handling code here:
+        id = String.valueOf(txtIdPaket.getText());
+        tipe = txtTipePaket.getItemAt(txtTipePaket.getSelectedIndex()).toString();
+        asuransi = Integer.parseInt(txtAsuransiPaket.getText());
+        harga = Integer.parseInt(txtHargaPaket.getText());
+        if(JOptionPane.showConfirmDialog( this, "Apakah anda yakin ingin mengubah data ini", "Konfirmasi",
+            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+        {
+            try {
+                sql = "update tb12_paket set "
+                        + "tipe_paket = '"+ tipe +"', "
+                        + "asuransi_paket = '"+ asuransi +"', "
+                        + "harga_paket = '"+ harga +"' "
+                        + "where id_paket = '"+ id +"' ";
+                st = conn.getCon().createStatement();
+                st.execute(sql);
+                dataPaket("select * from tb12_paket");
+                JOptionPane.showMessageDialog(null, "Data berhasil diubah");
+                defaultData();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Data gagal diubah" + e.getMessage());
+            }
+        }
     }//GEN-LAST:event_btnUbahActionPerformed
+
+    private void tablePaketMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablePaketMouseClicked
+        // TODO add your handling code here:
+        txtIdPaket.setText(String.valueOf(tablePaket.getValueAt(tablePaket.getSelectedRow(), 1)));
+        txtTipePaket.setSelectedItem(String.valueOf(tablePaket.getValueAt(tablePaket.getSelectedRow(), 2)));
+        txtAsuransiPaket.setText(String.valueOf(tablePaket.getValueAt(tablePaket.getSelectedRow(), 3)));
+        txtHargaPaket.setText(String.valueOf(tablePaket.getValueAt(tablePaket.getSelectedRow(), 4)));
+    }//GEN-LAST:event_tablePaketMouseClicked
+
+    private void btnBerandaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBerandaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnBerandaActionPerformed
+
+    private void btnBatalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBatalActionPerformed
+        // TODO add your handling code here:
+        defaultData();
+    }//GEN-LAST:event_btnBatalActionPerformed
+
+    private void btnKeluarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKeluarActionPerformed
+        // TODO add your handling code here:
+        System.exit(1);
+    }//GEN-LAST:event_btnKeluarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -259,7 +366,7 @@ public class JF_Paket extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(JF_Paket.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
