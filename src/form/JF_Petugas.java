@@ -5,19 +5,78 @@
  */
 package form;
 
+import config.Koneksi;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author user
  */
 public class JF_Petugas extends javax.swing.JFrame {
+    
+    private Statement st;
+    private ResultSet rspetugas;
+    private String sql="";
+    private String tipe;
+    private int id, asuransi, harga;
 
     /**
      * Creates new form JF_Petugas
      */
     public JF_Petugas() {
         initComponents();
+        koneksiPetugas();
+        dataPetugas("select * from tb14_petugas");
     }
 
+    Koneksi conn = new Koneksi();
+    
+    private void koneksiPetugas(){
+        conn.kon();
+    }
+    
+    private void dataPetugas(String sql){
+        DefaultTableModel dataList = new DefaultTableModel();
+        dataList.addColumn("No");
+        dataList.addColumn("ID Petugas");
+        dataList.addColumn("Nama Petugas");
+        dataList.addColumn("NO Telepon");
+        dataList.addColumn("Alamat");
+        dataList.addColumn("Daerah Tugas");
+        dataList.addColumn("Jabatan");
+        try {
+            int i = 1;
+            st = conn.getCon().createStatement();
+            rspetugas = st.executeQuery(sql);
+            while(rspetugas.next()){
+                dataList.addRow(new Object[]{
+                    "" + i++,
+                    rspetugas.getString(1),
+                    rspetugas.getString(2),
+                    rspetugas.getString(3),
+                    rspetugas.getString(4),
+                    rspetugas.getString(5),
+                    rspetugas.getString(6),
+                });
+                tablePetugas.setModel(dataList);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Gagal menampilkan data" + e.getMessage(), "error", JOptionPane.OK_OPTION);
+        }
+    }
+    
+    private void defaultData(){
+        txtIdPetugas.setText("");
+        txtNamaPetugas.setText("");
+        txtNoTelepon.setText("");
+        txtAlamatPetugas.setText("");
+        txtDaerahTugas.setText("");
+        txtJabatanPetugas.setText("");
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -78,6 +137,11 @@ public class JF_Petugas extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tablePetugas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tablePetugasMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tablePetugas);
 
         btnBeranda.setText("beranda");
@@ -190,6 +254,16 @@ public class JF_Petugas extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void tablePetugasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablePetugasMouseClicked
+        // TODO add your handling code here:
+        txtIdPetugas.setText(String.valueOf(tablePetugas.getValueAt(tablePetugas.getSelectedRow(), 1)));
+        txtNamaPetugas.setText(String.valueOf(tablePetugas.getValueAt(tablePetugas.getSelectedRow(), 2)));
+        txtNoTelepon.setText(String.valueOf(tablePetugas.getValueAt(tablePetugas.getSelectedRow(), 3)));
+        txtAlamatPetugas.setText(String.valueOf(tablePetugas.getValueAt(tablePetugas.getSelectedRow(), 4)));
+        txtDaerahTugas.setText(String.valueOf(tablePetugas.getValueAt(tablePetugas.getSelectedRow(), 5)));
+        txtJabatanPetugas.setText(String.valueOf(tablePetugas.getValueAt(tablePetugas.getSelectedRow(), 6)));
+    }//GEN-LAST:event_tablePetugasMouseClicked
 
     /**
      * @param args the command line arguments

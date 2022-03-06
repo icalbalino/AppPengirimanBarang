@@ -20,8 +20,8 @@ public class JF_Paket extends javax.swing.JFrame {
     private Statement st;
     private ResultSet rspaket;
     private String sql="";
-    private String id, tipe;
-    private int asuransi, harga;
+    private String tipe;
+    private int id, asuransi, harga;
 
     /**
      * Creates new form JF_Paket
@@ -48,7 +48,7 @@ public class JF_Paket extends javax.swing.JFrame {
         try {
             int i = 1;
             st = conn.getCon().createStatement();
-            rspaket = st.executeQuery("select * from tb12_paket");
+            rspaket = st.executeQuery(sql);
             while(rspaket.next()){
                 dataList.addRow(new Object[]{
                     "" + i++,
@@ -258,7 +258,7 @@ public class JF_Paket extends javax.swing.JFrame {
 
     private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusActionPerformed
         // TODO add your handling code here:
-        id = String.valueOf(txtIdPaket.getText());
+        id = Integer.parseInt(txtIdPaket.getText());
         if(JOptionPane.showConfirmDialog( null, "Apakah anda yakin ingin menghapus data ini", "Konfirmasi",
             JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
         {
@@ -277,7 +277,7 @@ public class JF_Paket extends javax.swing.JFrame {
 
     private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
         // TODO add your handling code here:
-        id = String.valueOf(txtIdPaket.getText());
+        id = Integer.parseInt(txtIdPaket.getText());
         tipe = txtTipePaket.getItemAt(txtTipePaket.getSelectedIndex()).toString();
         asuransi = Integer.parseInt(txtAsuransiPaket.getText());
         harga = Integer.parseInt(txtHargaPaket.getText());
@@ -295,7 +295,7 @@ public class JF_Paket extends javax.swing.JFrame {
 
     private void btnUbahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUbahActionPerformed
         // TODO add your handling code here:
-        id = String.valueOf(txtIdPaket.getText());
+        id = Integer.parseInt(txtIdPaket.getText());
         tipe = txtTipePaket.getItemAt(txtTipePaket.getSelectedIndex()).toString();
         asuransi = Integer.parseInt(txtAsuransiPaket.getText());
         harga = Integer.parseInt(txtHargaPaket.getText());

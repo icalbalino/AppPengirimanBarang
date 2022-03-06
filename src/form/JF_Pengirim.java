@@ -5,19 +5,84 @@
  */
 package form;
 
+import config.Koneksi;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author user
  */
 public class JF_Pengirim extends javax.swing.JFrame {
+    
+    private Statement st;
+    private ResultSet rspengirim;
+    private String sql="";
+    private String namaPengirim, noTelp, alamat, daerah, kota, provinsi;
+    private int id, kodePos;
 
     /**
      * Creates new form JF_Pengirim
      */
     public JF_Pengirim() {
         initComponents();
+        koneksiPengirim();
+        dataPengirim("select * from tb13_pengirim");
+    }
+    
+    Koneksi conn = new Koneksi();
+    
+    private void koneksiPengirim(){
+        conn.kon();
     }
 
+    private void dataPengirim(String sql){
+        DefaultTableModel dataList = new DefaultTableModel();
+        dataList.addColumn("No");
+        dataList.addColumn("ID Pengirim");
+        dataList.addColumn("Nama Pengirim");
+        dataList.addColumn("NO Telepon");
+        dataList.addColumn("Alamat");
+        dataList.addColumn("Daerah");
+        dataList.addColumn("Kota");
+        dataList.addColumn("Provinsi");
+        dataList.addColumn("Kode POS");
+        try {
+            int i = 1;
+            st = conn.getCon().createStatement();
+            rspengirim = st.executeQuery(sql);
+            while(rspengirim.next()){
+                dataList.addRow(new Object[]{
+                    "" + i++,
+                    rspengirim.getString(1),
+                    rspengirim.getString(2),
+                    rspengirim.getString(3),
+                    rspengirim.getString(4),
+                    rspengirim.getString(5),
+                    rspengirim.getString(6),
+                    rspengirim.getString(7),
+                    rspengirim.getString(8),
+                });
+                tablePengirim.setModel(dataList);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Gagal menampilkan data" + e.getMessage(), "error", JOptionPane.OK_OPTION);
+        }
+    }
+    
+    private void defaultData(){
+        txtIdPengirim.setText("");
+        txtNamaPengirim.setText("");
+        txtNoTelepon.setText("");
+        txtAlamatPengirim.setText("");
+        txtDaerahPengirim.setText("");
+        txtKotaPengirim.setText("");
+        txtProvinsiPengirim.setText("");
+        txtNoTelepon.setText("");
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -88,6 +153,11 @@ public class JF_Pengirim extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tablePengirim.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tablePengirimMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tablePengirim);
 
         btnBeranda.setText("beranda");
@@ -202,6 +272,18 @@ public class JF_Pengirim extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void tablePengirimMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablePengirimMouseClicked
+        // TODO add your handling code here:
+        txtIdPengirim.setText(String.valueOf(tablePengirim.getValueAt(tablePengirim.getSelectedRow(), 1)));
+        txtNamaPengirim.setText(String.valueOf(tablePengirim.getValueAt(tablePengirim.getSelectedRow(), 2)));
+        txtNoTelepon.setText(String.valueOf(tablePengirim.getValueAt(tablePengirim.getSelectedRow(), 3)));
+        txtAlamatPengirim.setText(String.valueOf(tablePengirim.getValueAt(tablePengirim.getSelectedRow(), 4)));
+        txtDaerahPengirim.setText(String.valueOf(tablePengirim.getValueAt(tablePengirim.getSelectedRow(), 5)));
+        txtKotaPengirim.setText(String.valueOf(tablePengirim.getValueAt(tablePengirim.getSelectedRow(), 6)));
+        txtProvinsiPengirim.setText(String.valueOf(tablePengirim.getValueAt(tablePengirim.getSelectedRow(), 7)));
+        txtKpPengirim.setText(String.valueOf(tablePengirim.getValueAt(tablePengirim.getSelectedRow(), 8)));
+    }//GEN-LAST:event_tablePengirimMouseClicked
 
     /**
      * @param args the command line arguments

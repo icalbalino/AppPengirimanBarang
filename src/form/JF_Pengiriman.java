@@ -5,17 +5,132 @@
  */
 package form;
 
+import config.Koneksi;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author user
  */
 public class JF_Pengiriman extends javax.swing.JFrame {
+    
+    private Statement st;
+    private ResultSet rspengiriman;
+    private ResultSet rspaket;
+    private ResultSet rspengirim;
+    private ResultSet rspetugas;
+    private String sql="";
+    private String idPaket, idPengirim, idPetugas, tanggal, penerima, noTelp, alamat, kota, provinsi, isiPaket, tipe;
+    private int id, asuransi, harga, berat, totalharga, kodePos;
 
     /**
      * Creates new form JF_Pengiriman
      */
     public JF_Pengiriman() {
         initComponents();
+        koneksiPengiriman();
+        dataPaket("select * from tb12_paket");
+        dataPengiriman("select * from tb11_pengiriman");
+    }
+    
+    Koneksi conn = new Koneksi();
+    
+    private void koneksiPengiriman(){
+        conn.kon();
+    }
+    
+    private void dataPengiriman(String sql){
+        DefaultTableModel dataList = new DefaultTableModel();
+        dataList.addColumn("No");
+        dataList.addColumn("ID Registrasi");
+        dataList.addColumn("ID Paket");
+        dataList.addColumn("ID Pengirim");
+        dataList.addColumn("ID Petugas");
+        dataList.addColumn("Tanggal");
+        dataList.addColumn("Nama Penerima");
+        dataList.addColumn("NO Telepon");
+        dataList.addColumn("Alamat Penerima");
+        dataList.addColumn("Kota Penerima");
+        dataList.addColumn("Provinsi Penerima");
+        dataList.addColumn("Kode POS");
+        dataList.addColumn("Isi Paket");
+        dataList.addColumn("Berat Paket");
+        dataList.addColumn("Total Harga");
+        try {
+            int i = 1;
+            st = conn.getCon().createStatement();
+            rspengiriman = st.executeQuery(sql);
+            while(rspengiriman.next()){
+                dataList.addRow(new Object[]{
+                    "" + i++,
+                    rspengiriman.getString(1),
+                    rspengiriman.getString(2),
+                    rspengiriman.getString(3),
+                    rspengiriman.getString(4),
+                    rspengiriman.getString(5),
+                    rspengiriman.getString(6),
+                    rspengiriman.getString(7),
+                    rspengiriman.getString(8),
+                    rspengiriman.getString(9),
+                    rspengiriman.getString(10),
+                    rspengiriman.getString(11),
+                    rspengiriman.getString(12),
+                    rspengiriman.getString(13),
+                    rspengiriman.getString(14),
+                });
+                tablePengiriman.setModel(dataList);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Gagal menampilkan data" + e.getMessage(), "error", JOptionPane.OK_OPTION);
+        }
+    }
+    
+    private void dataPaket(String sql){
+        try {
+            st = conn.getCon().createStatement();
+            rspaket = st.executeQuery(sql);
+            while(rspaket.next()){
+                idPaket = rspaket.getString(1);
+                txtIdPaket.addItem(idPaket);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Gagal menampilkan data(dPaket)" + e.getMessage(), "error", JOptionPane.OK_OPTION);
+        }
+    }
+    
+    private void dataPengirim(){
+        
+    }
+    
+    private void dataPetugas(){
+        
+    }
+    
+    private void defaultData(){
+        txtIdRegistrasi.setText("");
+        txtIdPaket.setSelectedItem("--pilih--");
+        txtIdPengirim.setSelectedItem("--pilih--");
+        txtIdPetugas.setSelectedItem("--pilih--");
+        txtTanggal.setDateFormatString("dd-mm-yyyy");
+        txtTipePaket.setText("");
+        txtIsiPaket.setText("");
+        txtNamaPetugas.setText("");
+        txtJabatanPetugas.setText("");
+        txtAsuransiPaket.setText("");
+        txtHargaPaket.setText("");
+        txtBeratPaket.setText("");
+        txtTotalHarga.setText("");
+        txtKpPenerima.setText("");
+        txtNamaPengirim.setText("");
+        txtAlamatPengirim.setText("");
+        txtNamaPenerima.setText("");
+        txtNoTelepon.setText("");
+        txtAlamatPenerima.setText("");
+        txtKotaPenerima.setText("");
+        txtProvinsiPenerima.setText("");
     }
 
     /**
@@ -66,18 +181,18 @@ public class JF_Pengiriman extends javax.swing.JFrame {
         txtAlamatPenerima = new javax.swing.JTextField();
         txtKotaPenerima = new javax.swing.JTextField();
         txtProvinsiPenerima = new javax.swing.JTextField();
-        txtTipePaket = new javax.swing.JComboBox<>();
         txtIdPaket = new javax.swing.JComboBox<>();
         txtIdPengirim = new javax.swing.JComboBox<>();
         txtIdPetugas = new javax.swing.JComboBox<>();
-        tablePengiriman = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        containerTable = new javax.swing.JScrollPane();
+        tablePengiriman = new javax.swing.JTable();
         btnBeranda = new javax.swing.JButton();
         btnSimpan = new javax.swing.JButton();
         btnUbah = new javax.swing.JButton();
         btnHapus = new javax.swing.JButton();
         btnBatal = new javax.swing.JButton();
         btnKeluar = new javax.swing.JButton();
+        txtTipePaket = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -127,15 +242,30 @@ public class JF_Pengiriman extends javax.swing.JFrame {
 
         jLabel22.setText("Provinsi");
 
-        txtTipePaket.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "--pilih--", "reguler", "kilat", "ekspress", "bigpress" }));
+        txtIdPaket.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "--pilih--" }));
+        txtIdPaket.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                txtIdPaketItemStateChanged(evt);
+            }
+        });
 
-        txtIdPaket.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        txtIdPengirim.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "--pilih--" }));
+        txtIdPengirim.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                txtIdPengirimItemStateChanged(evt);
+            }
+        });
 
-        txtIdPengirim.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        txtIdPetugas.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "--pilih--" }));
+        txtIdPetugas.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                txtIdPetugasItemStateChanged(evt);
+            }
+        });
 
-        txtIdPetugas.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        containerTable.setName(""); // NOI18N
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tablePengiriman.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -146,7 +276,12 @@ public class JF_Pengiriman extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tablePengiriman.setViewportView(jTable1);
+        tablePengiriman.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tablePengirimanMouseClicked(evt);
+            }
+        });
+        containerTable.setViewportView(tablePengiriman);
 
         btnBeranda.setText("beranda");
 
@@ -271,7 +406,7 @@ public class JF_Pengiriman extends javax.swing.JFrame {
                                 .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txtNamaPengirim, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addComponent(tablePengiriman))
+                    .addComponent(containerTable))
                 .addContainerGap(40, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -361,12 +496,55 @@ public class JF_Pengiriman extends javax.swing.JFrame {
                         .addComponent(btnBatal, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnKeluar, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(tablePengiriman, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addComponent(containerTable, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap(40, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void tablePengirimanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablePengirimanMouseClicked
+        // TODO add your handling code here:
+        txtIdRegistrasi.setText(String.valueOf(tablePengiriman.getValueAt(tablePengiriman.getSelectedRow(), 1)));
+        txtIdPaket.setSelectedItem(String.valueOf(tablePengiriman.getValueAt(tablePengiriman.getSelectedRow(), 2)));
+        txtIdPengirim.setSelectedItem(String.valueOf(tablePengiriman.getValueAt(tablePengiriman.getSelectedRow(), 3)));
+        txtIdPetugas.setSelectedItem(String.valueOf(tablePengiriman.getValueAt(tablePengiriman.getSelectedRow(), 4)));
+        txtTanggal.setDateFormatString(String.valueOf(tablePengiriman.getValueAt(tablePengiriman.getSelectedRow(), 5)));
+        txtNamaPenerima.setText(String.valueOf(tablePengiriman.getValueAt(tablePengiriman.getSelectedRow(), 6)));
+        txtNoTelepon.setText(String.valueOf(tablePengiriman.getValueAt(tablePengiriman.getSelectedRow(), 7)));
+        txtAlamatPenerima.setText(String.valueOf(tablePengiriman.getValueAt(tablePengiriman.getSelectedRow(), 8)));
+        txtKotaPenerima.setText(String.valueOf(tablePengiriman.getValueAt(tablePengiriman.getSelectedRow(), 9)));
+        txtProvinsiPenerima.setText(String.valueOf(tablePengiriman.getValueAt(tablePengiriman.getSelectedRow(), 10)));
+        txtKpPenerima.setText(String.valueOf(tablePengiriman.getValueAt(tablePengiriman.getSelectedRow(), 11)));
+        txtIsiPaket.setText(String.valueOf(tablePengiriman.getValueAt(tablePengiriman.getSelectedRow(), 12)));
+        txtBeratPaket.setText(String.valueOf(tablePengiriman.getValueAt(tablePengiriman.getSelectedRow(), 13)));
+        txtTotalHarga.setText(String.valueOf(tablePengiriman.getValueAt(tablePengiriman.getSelectedRow(), 14)));
+    }//GEN-LAST:event_tablePengirimanMouseClicked
+
+    private void txtIdPaketItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_txtIdPaketItemStateChanged
+        // TODO add your handling code here:
+        try {
+            String sql = "select * from tb12_paket where id_paket = '"+ txtIdPaket.getSelectedItem() +"' ";
+            st = conn.getCon().createStatement();
+            rspaket = st.executeQuery(sql);
+            while(rspaket.next()){
+                txtTipePaket.setText(rspaket.getString(2));
+                txtAsuransiPaket.setText(rspaket.getString(3));
+                txtHargaPaket.setText(rspaket.getString(4));
+            }
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Gagal menampilkan data(dPaket)" + e.getMessage(), "error", JOptionPane.OK_OPTION);
+        }
+    }//GEN-LAST:event_txtIdPaketItemStateChanged
+
+    private void txtIdPengirimItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_txtIdPengirimItemStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtIdPengirimItemStateChanged
+
+    private void txtIdPetugasItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_txtIdPetugasItemStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtIdPetugasItemStateChanged
 
     /**
      * @param args the command line arguments
@@ -410,6 +588,7 @@ public class JF_Pengiriman extends javax.swing.JFrame {
     private javax.swing.JButton btnKeluar;
     private javax.swing.JButton btnSimpan;
     private javax.swing.JButton btnUbah;
+    private javax.swing.JScrollPane containerTable;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -432,8 +611,7 @@ public class JF_Pengiriman extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JScrollPane tablePengiriman;
+    private javax.swing.JTable tablePengiriman;
     private javax.swing.JTextField txtAlamatPenerima;
     private javax.swing.JTextField txtAlamatPengirim;
     private javax.swing.JTextField txtAsuransiPaket;
@@ -453,7 +631,7 @@ public class JF_Pengiriman extends javax.swing.JFrame {
     private javax.swing.JTextField txtNoTelepon;
     private javax.swing.JTextField txtProvinsiPenerima;
     private com.toedter.calendar.JDateChooser txtTanggal;
-    private javax.swing.JComboBox<String> txtTipePaket;
+    private javax.swing.JTextField txtTipePaket;
     private javax.swing.JTextField txtTotalHarga;
     // End of variables declaration//GEN-END:variables
 }
